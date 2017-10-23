@@ -1,3 +1,4 @@
+
 print(__doc__)
 
 # Author: Gael Varoquaux gael.varoquaux@normalesup.org
@@ -171,8 +172,13 @@ edge_model.fit(X)
 _, labels = cluster.affinity_propagation(edge_model.covariance_)
 n_labels = labels.max()
 
+complete_text_output = ""
+
 for i in range(n_labels + 1):
-    print('Cluster %i: %s' % ((i + 1), ', '.join(names[labels == i])))
+    output_i = 'Cluster %i: %s' % ((i + 1), ', '.join(names[labels == i]))
+    complete_text_output += output_i + "\n"
+    print(output_i)
+
 
 # #############################################################################
 # Find a low-dimension embedding for visualization: find the best position of
@@ -254,4 +260,13 @@ plt.xlim(embedding[0].min() - .15 * embedding[0].ptp(),
 plt.ylim(embedding[1].min() - .03 * embedding[1].ptp(),
          embedding[1].max() + .03 * embedding[1].ptp())
 
+# Save ML algorithm output
+plt.savefig('last_result.pdf')
+f = open('last_result.txt', "w")
+f.write(complete_text_output)
+f.close()
+
+# Show plot of output
 plt.show()
+
+
