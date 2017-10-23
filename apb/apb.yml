@@ -1,0 +1,18 @@
+version: 1.0
+name: hello-sns-apb
+description: deploys hello-sns web application
+bindable: False
+async: optional
+metadata:
+  displayName: Hello SNS (APB)
+  longDescription: A sample APB which deploys a containerized Hello SNS web application
+  dependencies: ['docker.io/apbtesting/hello-sns:latest']
+plans:
+  - name: default
+    description: A sample APB which deploys Hello SNS
+    free: True
+    metadata:
+      displayName: Default
+      longDescription: This plan deploys a Python web application displaying Hello SNS
+      cost: $0.00
+    parameters: []
