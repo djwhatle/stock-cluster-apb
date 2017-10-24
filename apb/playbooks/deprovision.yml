@@ -1,9 +1,9 @@
-- name: hello-sns-apb deprovision
+- name: stock-categorizer-apb deprovision
   hosts: localhost
   gather_facts: false
   connection: local
   roles:
   - role: ansible.kubernetes-modules
     install_python_requirements: no
-  - role: deprovision-hello-sns-apb
+  - role: deprovision-stock-categorizer-apb
     playbook_debug: false

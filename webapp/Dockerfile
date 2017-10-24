@@ -2,9 +2,9 @@ FROM centos:7
 
 EXPOSE 8080
 
-RUN mkdir -p /usr/src/hello-sns
-COPY requirements.txt /usr/src/hello-sns
-WORKDIR /usr/src/hello-sns/
+RUN mkdir -p /usr/src/stock-categorizer
+COPY requirements.txt /usr/src/stock-categorizer
+WORKDIR /usr/src/stock-categorizer/
 
 RUN yum -y install centos-release-scl && \
     yum -y install --setopt=tsflags=nodocs rh-python35-python-pip && \
@@ -20,8 +20,8 @@ source scl_source enable rh-python35\n\
 exec "$@"' > /usr/bin/entrypoint.sh && \
     chmod +x /usr/bin/entrypoint.sh
 
-COPY src /usr/src/hello-sns/src
-WORKDIR /usr/src/hello-sns/src
+COPY src /usr/src/stock-categorizer/src
+WORKDIR /usr/src/stock-categorizer/src
 
 USER 99
 ENTRYPOINT [ "entrypoint.sh" ]

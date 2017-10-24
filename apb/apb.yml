@@ -1,18 +1,18 @@
 version: 1.0
-name: hello-sns-apb
-description: deploys hello-sns web application
+name: stock-categorizer-apb
+description: deploys stock-categorizer web application
 bindable: False
 async: optional
 metadata:
-  displayName: Hello SNS (APB)
-  longDescription: A sample APB which deploys a containerized Hello SNS web application
-  dependencies: ['docker.io/apbtesting/hello-sns:latest']
+  displayName: Stock Categorizer (APB)
+  longDescription: An APB which deploys a stock categorizer web app taking advantage of sklearn and AWS services (RDS, SQS, SNS, S3)
+  dependencies: ['docker.io/apbtesting/stock-categorizer:latest']
 plans:
   - name: default
-    description: A sample APB which deploys Hello SNS
+    description: An APB which deploys a stock categorizer machine-learning web application
     free: True
     metadata:
       displayName: Default
-      longDescription: This plan deploys a Python web application displaying Hello SNS
+      longDescription: Deploys a stock categorizer machine-learning web application taking advantage of sklearn and AWS services (RDS, SQS, SNS, S3)
       cost: $0.00
     parameters: []

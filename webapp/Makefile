@@ -1,6 +1,6 @@
 CONTEXT = djwhatle
 VERSION = v0.1
-IMAGE_NAME = hello-sns
+IMAGE_NAME = stock-categorizer
 
 all: build
 build:
