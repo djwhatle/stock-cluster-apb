@@ -1,4 +1,13 @@
-bottle==0.12.13
-psycopg2==2.7.1
-mysql-connector==2.1.6
-boto3==1.4.4
+bottle
+psycopg2
+peewee
+boto3
+matplotlib
+scikit-learn
+scipy
+numpy
+cycler
+pyparsing
+python-dateutil
+pytz
+six

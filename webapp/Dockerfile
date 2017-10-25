@@ -6,23 +6,13 @@ RUN mkdir -p /usr/src/stock-categorizer
 COPY requirements.txt /usr/src/stock-categorizer
 WORKDIR /usr/src/stock-categorizer/
 
-RUN yum -y install centos-release-scl && \
-    yum -y install --setopt=tsflags=nodocs rh-python35-python-pip && \
-    source scl_source enable rh-python35 && \
-    pip install --no-cache-dir -U pip setuptools && \
-    pip install --no-cache-dir -r requirements.txt && \
-    python -m pip uninstall -y pip setuptools && \
-    yum clean all
-
-# entrypoint to enable scl python at runtime
-RUN echo $'#!/bin/sh\n\
-source scl_source enable rh-python35\n\
-exec "$@"' > /usr/bin/entrypoint.sh && \
-    chmod +x /usr/bin/entrypoint.sh
+RUN yum -y install epel-release
+RUN yum -y install python34 python34-pip python34-tkinter
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY src /usr/src/stock-categorizer/src
 WORKDIR /usr/src/stock-categorizer/src
 
-USER 99
+#USER 99
 ENTRYPOINT [ "entrypoint.sh" ]
 CMD python app.py
