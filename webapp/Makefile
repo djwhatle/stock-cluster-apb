@@ -1,6 +1,6 @@
 CONTEXT = djwhatle
 VERSION = v0.1
-IMAGE_NAME = stock-categorizer
+IMAGE_NAME = stock-cluster
 
 all: build
 build:

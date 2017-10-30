@@ -1,0 +1,14 @@
+Cluster 1: GlaxoSmithKline, Novartis, Sanofi-Aventis
+Cluster 2: Cablevision
+Cluster 3: Canon, Caterpillar, Toyota, Xerox, Unilever, Honda, Sony
+Cluster 4: Boeing
+Cluster 5: Northrop Grumman, General Dynamics, Raytheon
+Cluster 6: Kimberly-Clark, Procter Gamble, Colgate-Palmolive
+Cluster 7: Dell, HP, Texas Instruments, Microsoft, SAP, Cisco, IBM
+Cluster 8: Kellogg, Coca Cola, Pepsi
+Cluster 9: Apple, Amazon, Yahoo
+Cluster 10: American express
+Cluster 11: Navistar
+Cluster 12: ConocoPhillips, Valero Energy, Total, Chevron, Exxon
+Cluster 13: Pfizer, CVS, 3M, Wal-Mart, Goldman Sachs, Bank of America, DuPont de Nemours, General Electrics, Comcast, Wells Fargo, Ryder, McDonald's, Home Depot, JPMorgan Chase, AIG, Marriott, Ford
+Cluster 14: Time Warner

@@ -1,9 +1,9 @@
-- name: stock-categorizer-apb provision
+- name: stock-cluster-apb provision
   hosts: localhost
   gather_facts: false
   connection: local
   roles:
   - role: ansible.kubernetes-modules
     install_python_requirements: no
-  - role: provision-stock-categorizer-apb
+  - role: provision-stock-cluster-apb
     playbook_debug: false

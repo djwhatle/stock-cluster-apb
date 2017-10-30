@@ -1,9 +1,9 @@
-- name: stock-categorizer-apb deprovision
+- name: stock-cluster-apb deprovision
   hosts: localhost
   gather_facts: false
   connection: local
   roles:
   - role: ansible.kubernetes-modules
     install_python_requirements: no
-  - role: deprovision-stock-categorizer-apb
+  - role: deprovision-stock-cluster-apb
     playbook_debug: false

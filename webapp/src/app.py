@@ -1,6 +1,30 @@
 from bottle import route, run, get, static_file, template, view, debug
 import os, boto3, string, random
 
+aws_vars = {
+    'sqs': {
+        'access_key': os.environ.get('SQS_AWS_ACCESS_KEY'),
+        'secret_key': os.environ.get('SQS_AWS_SECRET_KEY'),
+        'queue_arn': os.environ.get('SQS_QUEUE_ARN'),
+        'queue_name': os.environ.get('SQS_QUEUE_NAME'),
+        'queue_url': os.environ.get('SQS_QUEUE_URL'),
+        'region': os.environ.get('SQS_REGION')
+    },
+    'sns': {
+        'access_key': os.environ.get('SNS_AWS_ACCESS_KEY'),
+        'secret_key': os.environ.get('SNS_AWS_SECRET_KEY'),
+        'topic_arn': os.environ.get('SNS_TOPIC_ARN'),
+        'region': os.environ.get('SNS_AWS_REGION')
+    },
+    's3': {
+        'access_key': os.environ.get('S3_BUCKET_AWS_ACCESS_KEY_ID'),
+        'secret_key': os.environ.get('S3_BUCKET_AWS_SECRET_ACCESS_KEY'),
+        'bucket_arn': os.environ.get('S3_BUCKET_ARN'),
+        'bucket_name': os.environ.get('S3_BUCKET_NAME'),
+        'region': os.environ.get('S3_BUCKET_REGION')
+    }
+}
+
 @route('/')
 @view('index')
 def index():
@@ -11,19 +35,21 @@ def index():
 def token_login():
     return None
 
-@route('/token_generate')
-def token_generate():
-    sns_topic_arn = os.environ.get('SNS_TOPIC_ARN')
-    region_name = os.environ.get('AWS_REGION_NAME')
-    aws_access_key = os.environ.get('AWS_ACCESS_KEY')
-    aws_secret_key = os.environ.get('AWS_SECRET_KEY')
+@route('/queue_clustering_job')
+def queue_clustering_job():
 
-    generated_token = id_generator()
+    sqs = boto3.resource(
+        'sqs',
+        region_name=aws_vars['sqs']['region'],
+        aws_access_key_id=aws_vars['sqs']['access_key'],
+        aws_secret_access_key=aws_vars['sqs']['secret_key']
+    )
 
-    client = boto3.client("sns", region_name=region_name, aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key)
-    response = client.publish(TopicArn=sns_topic_arn, Message="Single use code: " + generated_token)
+    queue = sqs.Queue(aws_vars['sqs']['queue_url'])
+    response = queue.send_message(MessageBody='example-set', MessageGroupId=id_generator(), MessageDeduplicationId=id_generator())
 
-    return dict(generated_token=generated_token)
+    print(response)
+    return(response)
 
 @route('/admin_panel')
 @view('admin_panel')
@@ -51,8 +77,22 @@ def js(filename):
     return static_file(filename, root="static/js")
 
 
-def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
+def id_generator(size=128, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
+def validate_aws_vars(aws_vars):
+    vars_ok = True
+
+    for service_name, service_var_set in aws_vars.items():
+        for service_var in service_var_set:
+            if service_var.isspace():
+                print(service_name + " env var not found: " + service_var)
+                vars_ok = False
+
+    return vars_ok
+
 if __name__ == '__main__':
+    if not validate_aws_vars(aws_vars):
+        print("WARNING: One or more expected environment variables is missing. Ensure that binding with SQS, SNS, and S3 was successful.")
+
     run(host='0.0.0.0', port=8080, debug=True, reloader=True)

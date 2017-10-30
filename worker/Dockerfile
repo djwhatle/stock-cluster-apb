@@ -1,7 +1,5 @@
 FROM centos:7
 
-EXPOSE 8080
-
 RUN mkdir -p /usr/src/stock-cluster
 COPY requirements.txt /usr/src/stock-cluster
 WORKDIR /usr/src/stock-cluster/
@@ -13,6 +11,5 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 COPY src /usr/src/stock-cluster/src
 WORKDIR /usr/src/stock-cluster/src
 
-#USER 99
 ENTRYPOINT [ "entrypoint.sh" ]
-CMD python app.py
+CMD python3 worker.py
