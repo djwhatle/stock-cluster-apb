@@ -4,9 +4,9 @@ description: deploys stock-cluster web application and worker
 bindable: False
 async: optional
 metadata:
-  displayName: Stock Categorizer (APB)
+  displayName: Stock Cluster Analysis (APB)
   longDescription: An APB which deploys a stock categorizer web app and worker taking advantage of sklearn and AWS services (RDS, SQS, SNS, S3)
-  dependencies: ['docker.io/djwhatle/stock-cluster:latest']
+  dependencies: ['docker.io/djwhatle/stock-cluster-webapp:latest', 'docker.io/djwhatle/stock-cluster-worker:latest']
 plans:
   - name: default
     description: An APB which deploys a stock categorizer machine-learning web application and worker

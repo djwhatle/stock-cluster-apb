@@ -13,6 +13,4 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 COPY src /usr/src/stock-cluster/src
 WORKDIR /usr/src/stock-cluster/src
 
-#USER 99
-ENTRYPOINT [ "entrypoint.sh" ]
-CMD python app.py
+CMD python3 -u app.py

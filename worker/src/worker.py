@@ -255,8 +255,8 @@ def run_clustering_job(symbol_dict, start_date=datetime(2003, 1, 1), end_date=da
     pdf_filename = output_filename + '.pdf'
     text_filename = output_filename + '.txt'
 
-    plt.savefig(pdf_filename)
-    f = open(text_filename, "w")
+    plt.savefig("/tmp/" + pdf_filename)
+    f = open("/tmp/" + text_filename, "w")
     f.write(complete_text_output)
     f.close()
 
@@ -384,9 +384,9 @@ def validate_aws_vars(aws_vars):
     vars_ok = True
 
     for service_name, service_var_set in aws_vars.items():
-        for service_var in service_var_set:
-            if service_var.isspace():
-                print(service_name + " env var not found or empty: " + service_var)
+        for service_var_name, service_var_val in service_var_set.items():
+            if not service_var_val:
+                print(service_name + " env var not found or empty: " + service_var_name)
                 vars_ok = False
 
     return vars_ok
@@ -435,7 +435,7 @@ def read_sqs_queue(aws_vars):
     message_body_list = []
 
     for message in queue.receive_messages():
-        print("Received message: " + str(message.body))
+        print("Received clustering job for dataset: " + str(message.body))
         message_body_list.append(message.body)
         message.delete()
 
@@ -460,6 +460,11 @@ def main():
                 # Plan to add dates later
                 dataset_name = message
 
+                print("User requested analysis of dataset '" + dataset_name + "' over dates: TBD")
+                print("\n\n'" + dataset_name + "' includes the following stocks and ticker symbols:")
+                print(temporary_symbol_sets[dataset_name] + "\n\n")
+
+                
                 print("=============================================================")
                 print("================== STARTING CLUSTERING JOB ==================")
                 print("=============================================================")
@@ -478,11 +483,11 @@ def main():
                 graph_filename = results['graph_filename']
 
                 # upload resulting file to s3 bucket
-                s3_url = upload_s3(aws_vars, graph_filename, graph_filename)
+                s3_url = upload_s3(aws_vars, "/tmp/" + graph_filename, graph_filename)
 
                 # clean up files
-                os.remove(output_filename + ".txt")
-                os.remove(output_filename + ".pdf")
+                os.remove("/tmp/" + output_filename + ".txt")
+                os.remove("/tmp/" + output_filename + ".pdf")
 
                 # email results including s3 link
                 email_body = "Stock clustering job completed in " + time_elapsed + " seconds.\n\n" + text_output + "\n\nGraphical output download link (valid for 10 hours): " + s3_url

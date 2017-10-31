@@ -84,9 +84,9 @@ def validate_aws_vars(aws_vars):
     vars_ok = True
 
     for service_name, service_var_set in aws_vars.items():
-        for service_var in service_var_set:
-            if service_var.isspace():
-                print(service_name + " env var not found: " + service_var)
+        for service_var_name, service_var_val in service_var_set.items():
+            if not service_var_val:
+                print(service_name + " env var not found or empty: " + service_var_name)
                 vars_ok = False
 
     return vars_ok
