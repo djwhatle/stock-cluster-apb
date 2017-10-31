@@ -444,8 +444,11 @@ def read_sqs_queue(aws_vars):
 def main():
     if not validate_aws_vars(aws_vars):
         print("WARNING: One or more expected environment variables is missing. Ensure that binding with SQS, SNS, and S3 was successful.")
+        while True:
+            sleep(10)
 
-    while(True):
+
+    while True:
         print("Polling SQS queue...")
         # check if there are any new jobs on the queue
         message_body_list = read_sqs_queue(aws_vars)
@@ -464,7 +467,7 @@ def main():
                 print("\n\n'" + dataset_name + "' includes the following stocks and ticker symbols:")
                 print(temporary_symbol_sets[dataset_name] + "\n\n")
 
-                
+
                 print("=============================================================")
                 print("================== STARTING CLUSTERING JOB ==================")
                 print("=============================================================")
