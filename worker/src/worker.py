@@ -445,8 +445,7 @@ def main():
     if not validate_aws_vars(aws_vars):
         print("WARNING: One or more expected environment variables is missing. Ensure that binding with SQS, SNS, and S3 was successful.")
         while True:
-            sleep(10)
-
+            time.sleep(10)
 
     while True:
         print("Polling SQS queue...")

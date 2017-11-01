@@ -5,12 +5,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <title>Stock Analysis</title>
 
-  <!-- <link rel='stylesheet' href='/static/css/main.css' /> -->
-  <!-- <link rel='stylesheet' href='/static/css/bootstrap.min.css' /> -->
   <link rel='stylesheet' href='../static/css/main.css' />
   <link rel='stylesheet' href='../static/css/bootstrap.min.css' />
 
-  <!-- <script src="/static/js/jquery-3.2.1.min.js"></script> -->
   <script src="../static/js/jquery-3.2.1.min.js"></script>
 </head>
 <body>
@@ -19,10 +16,31 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-12">
+          % if no_sns_creds:
+          <div class="alert alert-danger">
+            <strong>SNS bind credentials not found.</strong>
+          </div>
+          %   end
+          % if no_s3_creds:
+          <div class="alert alert-danger">
+            <strong>S3 bind credentials not found.</strong>
+          </div>
+          %   end
+          % if no_sqs_creds:
+          <div class="alert alert-danger">
+            <strong>SQS bind credentials not found.</strong>
+          </div>
+          %   end
+          % if disable_controls:
+          <div class="alert alert-danger">
+            Job queueing has been disabled. Attach bind credentials.
+          </div>
+          %   end
+
 
           <div class="row" style="padding: 50px 0px 10px 0px">
             <div class="col-md-12">
-              <h2 style="text-decoration: underline">Machine learning with the stock market</h2>
+              <h2 style="text-decoration: underline">Machine learning on public stocks</h2>
               <h5>Find relationships between publically traded companies using historical stock performance data</h5>
             </div>
           </div>
@@ -71,9 +89,23 @@
                   </div>
                 </div>
 
-                <button type="button" id="btnQueueNewJob" class="btn btn-primary">
-                  Add job to queue
-                </button>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      % if disable_controls:
+                      <button type="button" id="btnQueueNewJob" class="btn btn-primary" disabled>Add job to queue</button>
+                      % else:
+                      <button type="button" id="btnQueueNewJob" class="btn btn-primary">Add job to queue</button>
+                      % end
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <p id="queueLengthIndicator" style="margin-top: .5rem; font-size: 1.1rem; text-align: right">Jobs in queue: Unknown</p>
+                    </div>
+                  </div>
+                </div>
               </form>
             </div>
           </div>
@@ -102,6 +134,15 @@
       });
       showSnackbarAlert("Added job to queue!")
     });
+
+    % if not disable_controls:
+    window.setInterval(function(){
+      response = $.get("/get_queue_length", function() {
+        var x = document.getElementById("queueLengthIndicator")
+        x.textContent = ("Jobs in queue:" + response.responseJSON['queue_length'])
+      }, 1000);
+    })
+    % end
 
   </script>
 

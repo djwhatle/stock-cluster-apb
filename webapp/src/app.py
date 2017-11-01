@@ -26,30 +26,24 @@ aws_vars = {
 }
 
 @route('/')
+@route('/index')
 @view('index')
 def index():
-    return None
+    return dict(no_sqs_creds=(not aws_vars['sqs']['secret_key']),
+                no_sns_creds=(not aws_vars['sns']['secret_key']),
+                no_s3_creds=(not aws_vars['s3']['secret_key']),
+                disable_controls=((not aws_vars['sqs']['secret_key'])
+                               or (not aws_vars['sns']['secret_key']))
+                               or (not aws_vars['s3']['secret_key']))
 
-@route('/token_login')
-@view('token_login')
-def token_login():
-    return None
+
+@route('/get_queue_length')
+def get_queue_length():
+    return dict(queue_length=read_sqs_queue_length(aws_vars))
 
 @route('/queue_clustering_job')
 def queue_clustering_job():
-
-    sqs = boto3.resource(
-        'sqs',
-        region_name=aws_vars['sqs']['region'],
-        aws_access_key_id=aws_vars['sqs']['access_key'],
-        aws_secret_access_key=aws_vars['sqs']['secret_key']
-    )
-
-    queue = sqs.Queue(aws_vars['sqs']['queue_url'])
-    response = queue.send_message(MessageBody='example-set', MessageGroupId=id_generator(), MessageDeduplicationId=id_generator())
-
-    print(response)
-    return(response)
+    return publish_to_sqs_queue(aws_vars)
 
 @route('/admin_panel')
 @view('admin_panel')
@@ -91,8 +85,31 @@ def validate_aws_vars(aws_vars):
 
     return vars_ok
 
+def read_sqs_queue_length(aws_vars):
+    sqs = boto3.resource(
+        'sqs',
+        region_name=aws_vars['sqs']['region'],
+        aws_access_key_id=aws_vars['sqs']['access_key'],
+        aws_secret_access_key=aws_vars['sqs']['secret_key']
+    )
+
+    # Read messages from queue
+    queue = sqs.Queue(url=aws_vars['sqs']['queue_url'])
+    return len(queue.receive_messages())
+
+def publish_to_sqs_queue(aws_vars):
+    sqs = boto3.resource(
+        'sqs',
+        region_name=aws_vars['sqs']['region'],
+        aws_access_key_id=aws_vars['sqs']['access_key'],
+        aws_secret_access_key=aws_vars['sqs']['secret_key']
+    )
+
+    queue = sqs.Queue(aws_vars['sqs']['queue_url'])
+    return queue.send_message(MessageBody='example-set', MessageGroupId=id_generator(), MessageDeduplicationId=id_generator())
+
 if __name__ == '__main__':
     if not validate_aws_vars(aws_vars):
         print("WARNING: One or more expected environment variables is missing. Ensure that binding with SQS, SNS, and S3 was successful.")
 
-    run(host='0.0.0.0', port=8080, debug=True, reloader=True)
+    run(host='0.0.0.0', port=80, debug=True, reloader=True)
