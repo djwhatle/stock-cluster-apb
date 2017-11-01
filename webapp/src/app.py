@@ -1,4 +1,4 @@
-from bottle import route, run, get, static_file, template, view, debug
+from bottle import route, request, run, get, static_file, template, view, debug
 import os, boto3, string, random
 
 aws_vars = {
@@ -70,6 +70,10 @@ def img(filename):
 def js(filename):
     return static_file(filename, root="static/js")
 
+@get("/static/stocks/<filename:re:.*\.stocks>")
+def stocks(filename):
+    return static_file(filename, root="static/stocks")
+
 
 def id_generator(size=128, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -104,12 +108,13 @@ def publish_to_sqs_queue(aws_vars):
         aws_access_key_id=aws_vars['sqs']['access_key'],
         aws_secret_access_key=aws_vars['sqs']['secret_key']
     )
-
     queue = sqs.Queue(aws_vars['sqs']['queue_url'])
-    return queue.send_message(MessageBody='example-set', MessageGroupId=id_generator(), MessageDeduplicationId=id_generator())
+    # msg_body = request.query
+    msg_body = '{{"datasetName": "{}", "startDate": "{}", "endDate": "{}" }}'.format(request.query.datesetName, request.query.startDate, request.query.endDate)
+    return queue.send_message(MessageBody=msg_body, MessageGroupId=id_generator(), MessageDeduplicationId=id_generator())
 
 if __name__ == '__main__':
     if not validate_aws_vars(aws_vars):
         print("WARNING: One or more expected environment variables is missing. Ensure that binding with SQS, SNS, and S3 was successful.")
 
-    run(host='0.0.0.0', port=80, debug=True, reloader=True)
+    run(host='0.0.0.0', port=8080, debug=True, reloader=True)

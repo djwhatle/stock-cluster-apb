@@ -9,6 +9,7 @@ from datetime import datetime
 import os
 import sys
 import time
+import json
 import boto3
 import string, random
 import numpy as np
@@ -374,6 +375,30 @@ temporary_symbol_sets = {
         'MNTA': 'Momenta Pharmaceuticals',
         'IRWD': 'Ironwood Pharmaceuticals',
         'SQ': 'Square'
+    },
+    'mini-set': {
+        'NVDA': 'NVIDIA Corp',
+        'AMD': 'Advanced Micro Devices',
+        'AAPL': 'Apple',
+        'AMZN': 'Amazon.com',
+        'GOOGL': 'Alphabet',
+        'ADBE': 'Adobe Systems',
+        'FB': 'Facebook',
+        'MSFT': 'Microsoft Corp',
+        'RHT': 'Red Hat',
+        'ALNY': 'Alnylam Pharmaceuticals',
+        'IONS': 'Ionis Pharmaceuticals',
+        'MA': 'MasterCard',
+        'PYPL': 'PayPal Holdings',
+        'EA': 'Electronic Arts',
+        'ALXN': 'Alexion Pharmaceuticals',
+        'SAGE': 'Sage Therapeutics',
+        'JBLU': 'JetBlue Airways Corp',
+        'BA': 'The Boeing Co',
+        'LUV': 'Southwest Airlines Co',
+        'LXRX': 'Lexicon Pharmaceuticals',
+        'MDCO': 'The Medicines Company',
+        'SQ': 'Square'
     }
 }
 
@@ -435,7 +460,7 @@ def read_sqs_queue(aws_vars):
     message_body_list = []
 
     for message in queue.receive_messages():
-        print("Received clustering job for dataset: " + str(message.body))
+        print("Received clustering job: " + str(message.body))
         message_body_list.append(message.body)
         message.delete()
 
@@ -460,11 +485,14 @@ def main():
             for message in message_body_list:
                 # Temporarily only sending dataset name in message.
                 # Plan to add dates later
-                dataset_name = message
+                message_json = json.loads(message)
 
-                print("User requested analysis of dataset '" + dataset_name + "' over dates: TBD")
+                start_date = datetime.strptime(message_json['startDate'], '%Y-%m-%d')
+                end_date = datetime.strptime(message_json['endDate'], '%Y-%m-%d')
+                dataset_name = message_json['datasetName']
+
                 print("\n\n'" + dataset_name + "' includes the following stocks and ticker symbols:")
-                print(temporary_symbol_sets[dataset_name] + "\n\n")
+                print(str(temporary_symbol_sets[dataset_name]) + "\n\n")
 
 
                 print("=============================================================")
@@ -473,7 +501,7 @@ def main():
 
                 output_filename = id_generator()
                 start_time = time.time()
-                results = run_clustering_job(temporary_symbol_sets[dataset_name], output_filename=output_filename)
+                results = run_clustering_job(temporary_symbol_sets[dataset_name], output_filename=output_filename, start_date=start_date, end_date=end_date)
                 time_elapsed = str(round(time.time() - start_time, 3))
 
                 print ("\nFinished job in " + str(time_elapsed) + " seconds.")

@@ -54,17 +54,19 @@
                     Stock dataset
                   </label>
                   <select class="form-control" id="stockSetSelect">
-                    <option>Fortune 500 Stocks</option>
-                    <option>Fidelity Contrafund Class K Stocks</option>
+                    <option disabled selected value> Select a list of stocks to analyze </option>
+                    <option value="example-set">Scikit-learn stocks (01/01/2003 -- 01/01/2008)</option>
+                    <option value="contrafund-set">Contrafund stocks (01/01/2017 -- 09/01/2017)</option>
+                    <option value="mini-set">Mini-set stocks (01/01/2017 -- 09/01/2017)</option>
                   </select>
                 </div>
 
                 <div class="form-group">
 
                   <label for="stockSetPreview">
-                    Stock dataset preview
+                    Preview
                   </label>
-                  <textarea disabled class="form-control" id="stockSetPreview">Select a dataset from the list above...</textarea disabled>
+                  <textarea disabled class="form-control" id="stockSetPreview" style="height: 300px; font-family: monospace">Select a dataset from the list above...</textarea disabled>
                 </div>
 
                 <div class="row">
@@ -100,11 +102,11 @@
                     </div>
                   </div>
 
-                  <div class="col-md-6">
+                  <!-- <div class="col-md-6">
                     <div class="form-group">
-                      <p id="queueLengthIndicator" style="margin-top: .5rem; font-size: 1.1rem; text-align: right">Jobs in queue: Unknown</p>
+                      <p id="queueLengthIndicator" style="margin-top: .5rem; font-size: 1.1rem; text-align: right">Loading worker node status...</p>
                     </div>
-                  </div>
+                  </div> -->
                 </div>
               </form>
             </div>
@@ -128,21 +130,42 @@
     }
 
     $("#btnQueueNewJob").click(function() {
-      response = $.get("/queue_clustering_job", function() {
-        // response_text = response.responseJSON['generated_token']
-        // alert(response)
+      startDateStr = $('#analysisStartDate')[0].value
+      endDateStr = $('#analysisEndDate')[0].value
+      datasetName = $('#stockSetSelect').val()
+      queueJobData = { 'datesetName': datasetName, 'startDate': startDateStr, 'endDate': endDateStr }
+      response = $.get("/queue_clustering_job", queueJobData, function() {
       });
       showSnackbarAlert("Added job to queue!")
     });
 
-    % if not disable_controls:
-    window.setInterval(function(){
-      response = $.get("/get_queue_length", function() {
-        var x = document.getElementById("queueLengthIndicator")
-        x.textContent = ("Jobs in queue:" + response.responseJSON['queue_length'])
-      }, 1000);
-    })
-    % end
+    $('#stockSetSelect').change(function () {
+      optionSelected = $(this).find("option:selected");
+      valueSelected  = optionSelected.val();
+      textSelected   = optionSelected.text();
+      response = $.get('/static/stocks/' + valueSelected + '.stocks', function() {
+        $('#stockSetPreview').val(response.responseText)
+      });
+    });
+
+
+
+    // % if not disable_controls:
+    // setInterval(function(){
+    //   response = $.get("/get_queue_length", function() {
+    //     queueLength = response.responseJSON['queue_length']
+    //     var x = document.getElementById("queueLengthIndicator")
+    //     if (queueLength > 0) {
+    //       x.textContent = ("Worker node is RUNNING")
+    //     }
+    //     else {
+    //       x.textContent = ("Worker node is INACTIVE")
+    //     }
+    //     // var x = document.getElementById("queueLengthIndicator")
+    //     // x.textContent = ("Jobs in queue: " + queueLength)
+    //   });
+    // }, 3000);
+    // % end
 
   </script>
 
